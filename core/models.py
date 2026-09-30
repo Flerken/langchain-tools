@@ -14,7 +14,8 @@ from openai import AuthenticationError, APIError  # общий класс
 from gigachat.exceptions import BadRequestError
 
 from core.config import settings
-from shemas.choice import GeneratedMenu, GeneratedRecipe
+#from shemas.choice import GeneratedMenu, GeneratedRecipe
+from tools.tools import convert_currency
 
 # Инициализация объекта GigaChat
 gigachat_model = GigaChat(
@@ -35,26 +36,31 @@ yandex_model = ChatOpenAI(
     max_tokens=settings.GIGACHAT_MAX_TOKENS,
 )
 
+currency_model = yandex_model.bind_tools([convert_currency])
 # Структурированные модели
 
-choice_model = gigachat_model.with_structured_output(GeneratedMenu)
-recipe_model = gigachat_model.with_structured_output(GeneratedRecipe)
-fake_models = GenericFakeChatModel(messages=iter(["Творог"]))
-
-choice_model_fallback = yandex_model.with_structured_output(GeneratedMenu)
-recipe_model_fallback = yandex_model.with_structured_output(GeneratedRecipe)
-
-def fallback_response_func(_):
-    return GeneratedMenu(dishes=["Варенные яйца"])
-
-fallback_response = RunnableLambda(fallback_response_func)
 
 
-choice_model_fallback = choice_model_fallback.with_retry(
-    stop_after_attempt=2,
-    retry_if_exception_type=(AuthenticationError, OpenAIAuthenticationError, ))
+#choice_model = gigachat_model.with_structured_output(GeneratedMenu)
+#recipe_model = gigachat_model.with_structured_output(GeneratedRecipe)
+#fake_models = GenericFakeChatModel(messages=iter(["Творог"]))
+#
+#choice_model_fallback = yandex_model.with_structured_output(GeneratedMenu)
+#recipe_model_fallback = yandex_model.with_structured_output(GeneratedRecipe)
 
-choice_model = choice_model.with_retry(stop_after_attempt=2, retry_if_exception_type=(BadRequestError, )).with_fallbacks(
-    fallbacks=[choice_model_fallback],
-    exceptions_to_handle=(BadRequestError, )
-)
+
+
+#def fallback_response_func(_):
+#    return GeneratedMenu(dishes=["Варенные яйца"])
+#
+#fallback_response = RunnableLambda(fallback_response_func)
+#
+#
+#choice_model_fallback = choice_model_fallback.with_retry(
+#    stop_after_attempt=2,
+#    retry_if_exception_type=(AuthenticationError, OpenAIAuthenticationError, ))
+#
+#choice_model = choice_model.with_retry(stop_after_attempt=2, retry_if_exception_type=(BadRequestError, )).with_fallbacks(
+#    fallbacks=[choice_model_fallback],
+#    exceptions_to_handle=(BadRequestError, )
+#)
