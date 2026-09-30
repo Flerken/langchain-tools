@@ -8,14 +8,15 @@ from langchain_core.language_models.fake_chat_models import GenericFakeChatModel
 from langchain_core.runnables import RunnableLambda
 from langchain_gigachat.chat_models import GigaChat
 # Импортируем модель GigaChat из библиотеки LangChain для отправки и получения сообщений через API GigaChat
+from langchain_openai.chat_models.base import OpenAIAuthenticationError, OpenAIInvalidRequestError
 from langchain_openai.chat_models import ChatOpenAI
-from langchain_openai.chat_models.base import OpenAIAuthenticationError
+from langchain_deepseek.chat_models import ChatDeepSeek
 from openai import AuthenticationError, APIError  # общий класс
 from gigachat.exceptions import BadRequestError
 
 from core.config import settings
 #from shemas.choice import GeneratedMenu, GeneratedRecipe
-from tools.tools import convert_currency
+from tools.tools import convert_currency_func
 
 # Инициализация объекта GigaChat
 gigachat_model = GigaChat(
@@ -36,7 +37,21 @@ yandex_model = ChatOpenAI(
     max_tokens=settings.GIGACHAT_MAX_TOKENS,
 )
 
-currency_model = yandex_model.bind_tools([convert_currency])
+deepseek_model = ChatDeepSeek(
+    model=settings.DEEPSEEK_CHAT_MODEL,
+    # Можно явно задать модель GigaChat (по умолчанию запросы передаются в модель GigaChat Lite, поэтому для теста строка закоментирована).
+    api_key=settings.OPEN_AI_API_KEY,
+    base_url=settings.OPEN_AI_BASE_URL,
+    temperature=settings.OPEN_AI_TEMPERATURE,  # Креативность ответов
+    max_tokens=settings.GIGACHAT_MAX_TOKENS,
+)
+
+currency_model_fallback = deepseek_model.bind_tools([convert_currency_func])
+
+currency_model = yandex_model.with_fallbacks(
+                    fallbacks=[currency_model_fallback],
+                    exceptions_to_handle=(BadRequestError, OpenAIInvalidRequestError, )).bind_tools([convert_currency_func])
+
 # Структурированные модели
 
 

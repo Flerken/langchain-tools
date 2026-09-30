@@ -28,5 +28,8 @@ class Settings(BaseSettings):
     OPEN_AI_TEMPERATURE: float= 0.7
     OPEN_AI_MAX_TOKENS: int = 100
 
+    #DeepSeek
+    DEEPSEEK_CHAT_MODEL: str
+
 # Создаем глобальный экземпляр настроек
 settings = Settings()
