@@ -17,10 +17,14 @@ tool_message = []
 tool_calls = result.tool_calls
 
 if tool_calls:
-    for tool_call in tool_calls:
-        if tool_call["name"] == "convert_currency":
-            output = convert_currency_func.invoke(tool_call["args"])
-            tool_message.append(ToolMessage(tool_call_id=tool_call["id"], content=output))
+    tool_message = convert_currency_func.batch(tool_calls)
+    print(tool_message)
+
+    #for tool_call in tool_calls:
+    #    if tool_call["name"] == "convert_currency":
+    #        output = convert_currency_func.invoke(tool_call["args"])
+    #        tool_message.append(ToolMessage(tool_call_id=tool_call["id"], content=output))
+
     messages = currency_prompt_template.format_messages(text=text)
     messages += [result]
     messages += tool_message
