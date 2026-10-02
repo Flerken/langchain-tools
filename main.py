@@ -22,21 +22,23 @@ tool_message = []
 
 tool_calls = result.tool_calls
 
+print(tool_calls)
+
 if tool_calls:
     for tool_call in tool_calls:
         tool = tools[tool_call["name"]]
         output = tool.invoke(tool_call["args"])
         tool_message.append(ToolMessage(tool_call_id=tool_call["id"], content=output))
-    messages = currency_prompt_template.format_messages(text=text)
 
+    messages = currency_prompt_template.format_messages(text=text)
     messages += [result]
     messages += tool_message
 
     final_result = currency_model.invoke(messages)
 
-    for message in messages:
-        print(message)
-        print()
+    #for message in messages:
+    #    print(message)
+    #    print()
     print(final_result.text)
 else:
     print(result.text)

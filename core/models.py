@@ -56,7 +56,7 @@ deepseek_model = ChatDeepSeek(
 
 currency_model_fallback = deepseek_model.bind_tools([convert_currency_func, iphone_price])
 
-currency_model = gigachat_model.with_fallbacks(
+currency_model = yandex_model.with_fallbacks(
                     fallbacks=[currency_model_fallback],
                     exceptions_to_handle=(BadRequestError, OpenAIInvalidRequestError, )).bind_tools([convert_currency_func, iphone_price])
 
