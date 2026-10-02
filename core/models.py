@@ -16,15 +16,23 @@ from gigachat.exceptions import BadRequestError
 
 from core.config import settings
 #from shemas.choice import GeneratedMenu, GeneratedRecipe
-from tools.tools import convert_currency_func
+from tools.tools import convert_currency_func, iphone_price
 
 # Инициализация объекта GigaChat
-gigachat_model = GigaChat(
-    model=settings.GIGACHAT_CHAT_MODEL, # Можно явно задать модель GigaChat (по умолчанию запросы передаются в модель GigaChat Lite, поэтому для теста строка закоментирована).
-    credentials=settings.GIGACHAT_CREDENTIALS, # Для авторизации запросов используйте ключ, полученный в проекте GigaChat API
-    scope=settings.GIGACHAT_SCOPE, # Область использования API (по умолчанию GIGACHAT_API_PERS для физ. лиц)
-    verify_ssl_certs=settings.GIGACHAT_VERIFY_SSL, # Проверка сертификата, для учебных задач можно отключить, но для производственных средств его необходимо включить и установить сертификаты
-    ca_bundle_file=settings.GIGACHAT_CA_BUNDLE_FILE,
+#gigachat_model = GigaChat(
+#    model=settings.GIGACHAT_CHAT_MODEL, # Можно явно задать модель GigaChat (по умолчанию запросы передаются в модель GigaChat Lite, поэтому для теста строка закоментирована).
+#    credentials=settings.GIGACHAT_CREDENTIALS, # Для авторизации запросов используйте ключ, полученный в проекте GigaChat API
+#    scope=settings.GIGACHAT_SCOPE, # Область использования API (по умолчанию GIGACHAT_API_PERS для физ. лиц)
+#    verify_ssl_certs=settings.GIGACHAT_VERIFY_SSL, # Проверка сертификата, для учебных задач можно отключить, но для производственных средств его необходимо включить и установить сертификаты
+#    ca_bundle_file=settings.GIGACHAT_CA_BUNDLE_FILE,
+#    temperature=settings.GIGACHAT_TEMPERATURE,  # Креативность ответов
+#    max_tokens=settings.GIGACHAT_MAX_TOKENS,
+#)
+
+gigachat_model = ChatOpenAI(
+    model=settings.CLOUD_CHAT_MODEL, # Можно явно задать модель GigaChat (по умолчанию запросы передаются в модель GigaChat Lite, поэтому для теста строка закоментирована).
+    api_key=settings.CLOUD_API_KEY, # Для авторизации запросов используйте ключ, полученный в проекте GigaChat API
+    base_url=settings.CLOUD_BASE_URL,
     temperature=settings.GIGACHAT_TEMPERATURE,  # Креативность ответов
     max_tokens=settings.GIGACHAT_MAX_TOKENS,
 )
@@ -46,11 +54,11 @@ deepseek_model = ChatDeepSeek(
     max_tokens=settings.GIGACHAT_MAX_TOKENS,
 )
 
-currency_model_fallback = deepseek_model.bind_tools([convert_currency_func])
+currency_model_fallback = deepseek_model.bind_tools([convert_currency_func, iphone_price])
 
-currency_model = yandex_model.with_fallbacks(
+currency_model = gigachat_model.with_fallbacks(
                     fallbacks=[currency_model_fallback],
-                    exceptions_to_handle=(BadRequestError, OpenAIInvalidRequestError, )).bind_tools([convert_currency_func])
+                    exceptions_to_handle=(BadRequestError, OpenAIInvalidRequestError, )).bind_tools([convert_currency_func, iphone_price])
 
 # Структурированные модели
 

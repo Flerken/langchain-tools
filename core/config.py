@@ -31,5 +31,10 @@ class Settings(BaseSettings):
     #DeepSeek
     DEEPSEEK_CHAT_MODEL: str
 
+    #CloudAPI
+    CLOUD_API_KEY:str
+    CLOUD_BASE_URL: str
+    CLOUD_CHAT_MODEL:str
+
 # Создаем глобальный экземпляр настроек
 settings = Settings()
