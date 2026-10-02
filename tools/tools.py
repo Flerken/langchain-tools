@@ -1,12 +1,8 @@
 import requests
-from  langchain_core.tools import tool
+from  langchain_core.tools import tool, StructuredTool
 from tools.shemas import ConvertCurrencyArgs
 
-@tool(
-    "convert_currency",
-    args_schema=ConvertCurrencyArgs,
-    description="Конвертирует заданную сумму из одной валюты в другую по актуальному курсу"
-)
+
 def convert_currency_func(amount: float, from_currency: str, to_currency: str) -> float| str:
     """
     Конвертирует заданную сумму из одной валюты в другую по актуальному курсу.
@@ -20,6 +16,13 @@ def convert_currency_func(amount: float, from_currency: str, to_currency: str) -
     result = amount * rate
     return round(result, 2)
 
+convert_currency_tool = StructuredTool(
+    func = convert_currency_func,
+    name="convert_currency",
+    args_schema=ConvertCurrencyArgs,
+    description="Конвертирует заданную сумму из одной валюты в другую по актуальному курсу."
+)
+
 @tool()
 def iphone_price() -> float:
     """
@@ -29,4 +32,4 @@ def iphone_price() -> float:
     return 85_000.00
 
 if __name__ == "__main__":
-    print(convert_currency_func.invoke({"amount": 100, "from_currency" : "USD", "to_currency" : "RUB"}))
+    print(convert_currency_func(**{"amount": 100, "from_currency" : "USD", "to_currency" : "RUB"}))

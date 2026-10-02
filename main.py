@@ -1,7 +1,7 @@
 from locale import currency
 
 from core.chains import currency_chain
-from tools.tools import convert_currency_func, iphone_price
+from tools.tools import convert_currency_tool, iphone_price
 from core.prompts import currency_prompt_template
 from langchain_core.messages import ToolMessage
 from core.models import currency_model
@@ -16,7 +16,7 @@ result = currency_chain.invoke({"text": text})
 
 tools = {
     "iphone_price": iphone_price,
-    "convert_currency" : convert_currency_func
+    "convert_currency" : convert_currency_tool
 }
 tool_message = []
 

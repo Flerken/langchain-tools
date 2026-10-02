@@ -16,7 +16,7 @@ from gigachat.exceptions import BadRequestError
 
 from core.config import settings
 #from shemas.choice import GeneratedMenu, GeneratedRecipe
-from tools.tools import convert_currency_func, iphone_price
+from tools.tools import convert_currency_tool, iphone_price
 
 # Инициализация объекта GigaChat
 #gigachat_model = GigaChat(
@@ -54,11 +54,11 @@ deepseek_model = ChatDeepSeek(
     max_tokens=settings.GIGACHAT_MAX_TOKENS,
 )
 
-currency_model_fallback = deepseek_model.bind_tools([convert_currency_func, iphone_price])
+currency_model_fallback = deepseek_model.bind_tools([convert_currency_tool, iphone_price])
 
 currency_model = yandex_model.with_fallbacks(
                     fallbacks=[currency_model_fallback],
-                    exceptions_to_handle=(BadRequestError, OpenAIInvalidRequestError, )).bind_tools([convert_currency_func, iphone_price])
+                    exceptions_to_handle=(BadRequestError, OpenAIInvalidRequestError, )).bind_tools([convert_currency_tool, iphone_price])
 
 # Структурированные модели
 
